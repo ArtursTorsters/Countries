@@ -52,16 +52,18 @@ class CountryController extends Controller
 
         $countries = Country::search($query);
 
-        return response()->json($countries->map(function ($country) {
+        //  convert to array
+        $formattedCountries = $countries->map(function ($country) {
             return [
                 'code' => $country->country_code,
                 'name' => $country->common_name,
                 'official_name' => $country->official_name,
                 'flag' => $country->flag,
             ];
-        }));
-    }
+        })->values()->all();
 
+        return response()->json($formattedCountries);
+    }
 
     public function byLanguage($languageCode)
     {

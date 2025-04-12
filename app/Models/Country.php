@@ -47,22 +47,42 @@ class Country extends Model
             ->exists();
     }
 
-    public static function searchCountriesByName($query)
-    {
-        return static::query()
-            ->where(function ($q) use ($query) {
-                $q->where('common_name', 'LIKE', "%{$query}%")
-                    ->orWhere('official_name', 'LIKE', "%{$query}%")
-                    ->orWhereRaw("JSON_SEARCH(LOWER(translations), 'one', ?) IS NOT NULL", ["%".strtolower($query)."%"]);
-            })
-            ->get();
-    }
-
-
     public static function countriesByLanguage($languageCode)
     {
         return static::query()
             ->whereRaw("JSON_EXTRACT(languages, ?) IS NOT NULL", ['$."' . $languageCode . '"'])
             ->get();
+    }
+
+    public static function search($query)
+    {
+        if (empty($query)) {
+            return collect([]);
+        }
+
+        $pattern = '/' . preg_quote($query, '/') . '/i';
+        $allCountries = static::all();
+
+        return $allCountries->filter(function($country) use ($pattern) {
+            if (preg_match($pattern, $country->common_name) ||
+                preg_match($pattern, $country->official_name)) {
+                return true;
+            }
+            $translations = is_array($country->translations)
+                ? $country->translations
+                : json_decode($country->translations, true);
+
+            if (!is_array($translations)) {
+                return false;
+            }
+            foreach ($translations as $langCode => $translation) {
+                if ((isset($translation['common']) && preg_match($pattern, $translation['common'])) ||
+                    (isset($translation['official']) && preg_match($pattern, $translation['official']))) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 }
