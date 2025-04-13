@@ -10,17 +10,14 @@ use Illuminate\Support\Facades\DB;
 class FetchCountriesCommand extends Command
 {
     protected $signature = 'countries:fetch';
-    protected $description = 'Fetch countries data from restcountries.com API and populate the database';
 
     public function handle()
     {
-        $this->info('Fetching countries data...');
-
         try {
             $response = Http::get('https://restcountries.com/v3.1/all');
 
             if (!$response->successful()) {
-                $this->error('Failed to fetch countries data: ' . $response->status());
+                $this->error($response->status());
                 return 1;
             }
 
@@ -68,14 +65,14 @@ class FetchCountriesCommand extends Command
                 }
 
                 DB::commit();
-                $this->info('Database populated successfully!');
+                $this->info('Database populated');
             } catch (\Exception $e) {
                 DB::rollBack();
-                $this->error('Failed to populate database: ' . $e->getMessage());
+                $this->error($e->getMessage());
                 return 1;
             }
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e->getMessage());
+            $this->error($e->getMessage());
             return 1;
         }
 

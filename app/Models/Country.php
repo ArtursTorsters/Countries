@@ -38,9 +38,7 @@ class Country extends Model
 
         return Country::whereIn('country_code', $borders)->get();
     }
-    /**
-     *  if the country is favorited by user
-     */
+
     public function isFavorited($userId)
     {
         return Favorite::where('user_id', $userId)

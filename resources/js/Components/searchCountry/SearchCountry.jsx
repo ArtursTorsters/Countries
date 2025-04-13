@@ -20,8 +20,7 @@ export default function SearchCountry() {
         if (results.length > 0) {
             navigateToCountry(router, results[0].code);
         }
-    };
-
+    }
     return (
         <div className="relative w-full" ref={searchRef}>
             <Search

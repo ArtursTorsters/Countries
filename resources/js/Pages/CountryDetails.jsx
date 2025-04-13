@@ -1,50 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "@inertiajs/react";
-import axios from "axios";
 import Card from "../Components/global/Card";
 import Button from "../Components/global/Button";
+import { useCountryDetails } from "../Pages/countryDetailsHelper/countryDetailsHelpers";
 
 export default function CountryDetails({ code }) {
-    const [country, setCountry] = useState(null);
-    console.log("country object", country);
-
-    useEffect(() => {
-        const fetchCountryDetails = async () => {
-            try {
-                const response = await axios.get(`/api/countries/${code}`);
-                const countryData = {
-                    ...response.data,
-                    flag:
-                        typeof response.data.flag === "string"
-                            ? JSON.parse(response.data.flag)
-                            : response.data.flag,
-                    languages:
-                        typeof response.data.languages === "string"
-                            ? JSON.parse(response.data.languages)
-                            : response.data.languages,
-                };
-                setCountry(countryData);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchCountryDetails();
-    }, [code]);
-
-    const toggleFavorite = async () => {
-        if (!country) return;
-        try {
-            const response = await axios.post(
-                `/api/countries/${code}/favorite`
-            );
-            setCountry({
-                ...country,
-                is_favorite: response.data.is_favorite,
-            });
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    const { country, loading, error, toggleFavorite } = useCountryDetails(code)
 
     if (!country) return null;
 
@@ -70,7 +31,6 @@ export default function CountryDetails({ code }) {
                             padding="lg"
                             className="overflow-hidden"
                         >
-                            {/* country name */}
                             <div className="page-header -m-6 mb-6">
                                 {country.flag?.png && (
                                     <div
@@ -116,7 +76,7 @@ export default function CountryDetails({ code }) {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {/* Left col*/}
+                                {/* left*/}
                                 <div>
                                     <Card title="Flag" className="mb-6">
                                         <div className="flex justify-center">

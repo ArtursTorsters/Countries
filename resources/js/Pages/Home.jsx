@@ -37,7 +37,7 @@ export default function Home() {
 
                         <Card shadow="md" rounded="lg" padding="lg" className="bg-white">
                             <h2 className="text-3xl font-bold mb-6 text-text">
-                                Your Favorite Countries
+                                Favorite Countries
                             </h2>
                             <FavoriteCountries />
                         </Card>

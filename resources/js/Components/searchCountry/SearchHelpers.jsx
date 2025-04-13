@@ -18,9 +18,7 @@ export const useCountrySearch = () => {
         try {
             const response = await axios.get(
                 `/api/countries/search?query=${encodeURIComponent(searchQuery)}`
-            );
-            console.log(response);
-
+            )
             //flag JSON
             const parsedResults = response.data.map((country) => ({
                 ...country,
