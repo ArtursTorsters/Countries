@@ -14,13 +14,13 @@ class Favorite extends Model
     ];
 
 
-    public function favoriteCountry()
+    public function country()
     {
         return $this->belongsTo(Country::class, 'country_code', 'country_code');
     }
 
 
-    public static function toggleFavoriteStatusForCountry($userId, $countryCode)
+    public static function toggle($userId, $countryCode)
     {
         $favorite = static::where('user_id', $userId)
             ->where('country_code', $countryCode)

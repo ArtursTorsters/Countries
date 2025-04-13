@@ -28,32 +28,36 @@ class Country extends Model
         'translations' => 'array',
     ];
 
-    public function getNeighborCountries()
+    public function neighbors()
     {
-        if (!$this->borders) {
+        $borders = is_array($this->borders) ? $this->borders : json_decode($this->borders, true) ?? [];
+
+        if (empty($borders)) {
             return collect([]);
         }
 
-        return Country::whereIn('country_code', $this->borders)->get();
+        return Country::whereIn('country_code', $borders)->get();
     }
-
     /**
      *  if the country is favorited by user
      */
-    public function isFavoriteByUser($userId)
+    public function isFavorited($userId)
     {
         return Favorite::where('user_id', $userId)
             ->where('country_code', $this->country_code)
             ->exists();
     }
 
-    public static function countriesByLanguage($languageCode)
+    public static function byLanguage($languageCode)
     {
-        return static::query()
-            ->whereRaw("JSON_EXTRACT(languages, ?) IS NOT NULL", ['$."' . $languageCode . '"'])
-            ->get();
-    }
+        return static::all()->filter(function($country) use ($languageCode) {
+            $languages = is_array($country->languages)
+                ? $country->languages
+                : json_decode($country->languages, true);
 
+            return is_array($languages) && isset($languages[$languageCode]);
+        });
+    }
     public static function search($query)
     {
         if (empty($query)) {
@@ -85,4 +89,7 @@ class Country extends Model
             return false;
         });
     }
+
+
+
 }

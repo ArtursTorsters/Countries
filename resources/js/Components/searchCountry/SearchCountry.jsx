@@ -1,9 +1,9 @@
-import React from 'react';
-import { router } from '@inertiajs/react';
-import Search from "../global/Search"
-import Button from "../global/Button"
-import { useCountrySearch, navigateToCountry } from './SearchHelpers'
-import Loading from "../global/Loading"
+import React from "react";
+import { router } from "@inertiajs/react";
+import Search from "../global/Search";
+import Button from "../global/Button";
+import { useCountrySearch, navigateToCountry } from "./SearchHelpers";
+import Loading from "../global/Loading";
 
 export default function SearchCountry() {
     const {
@@ -13,7 +13,7 @@ export default function SearchCountry() {
         showResults,
         searchRef,
         handleChange,
-        setShowResults
+        setShowResults,
     } = useCountrySearch();
 
     const handleSearch = () => {
@@ -39,10 +39,16 @@ export default function SearchCountry() {
                     ) : results.length > 0 ? (
                         <ul>
                             {results.map((country) => (
-                                <li key={country.code} className="border-b last:border-b-0">
+                                <li
+                                    key={country.code}
+                                    className="border-b last:border-b-0"
+                                >
                                     <Button
                                         onClick={() => {
-                                            navigateToCountry(router, country.code);
+                                            navigateToCountry(
+                                                router,
+                                                country.code
+                                            );
                                             setShowResults(false);
                                         }}
                                         className="block w-full text-left p-3"
@@ -52,17 +58,27 @@ export default function SearchCountry() {
                                                 {country.flag?.png ? (
                                                     <img
                                                         src={country.flag.png}
-                                                        alt={country.flag.alt || `Flag of ${country.name}`}
+                                                        alt={
+                                                            country.flag.alt ||
+                                                            `Flag of ${country.name}`
+                                                        }
                                                         className="h-full w-auto object-cover"
                                                     />
                                                 ) : (
-                                                    <span className="text-xs">No flag</span>
+                                                    <span className="text-xs">
+                                                        No flag
+                                                    </span>
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-medium">{country.name}</p>
-                                                {country.official_name !== country.name && (
-                                                    <p className="text-xs">{country.official_name}</p>
+                                                <p className="font-medium">
+                                                    {country.name}
+                                                </p>
+                                                {country.official_name !==
+                                                    country.name && (
+                                                    <p className="text-xs">
+                                                        {country.official_name}
+                                                    </p>
                                                 )}
                                             </div>
                                         </div>

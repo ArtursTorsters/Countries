@@ -17,8 +17,10 @@ class CountryController extends Controller
     public function show($code)
     {
         $country = Country::where('country_code', $code)->firstOrFail();
-
-        $neighbors = $country->neighbors();
+        $borders = is_array($country->borders) ? $country->borders : json_decode($country->borders, true) ?? [];
+        $neighbors = count($borders) > 0
+            ? Country::whereIn('country_code', $borders)->get()
+            : collect([]);
 
         $result = [
             'code' => $country->country_code,
@@ -73,7 +75,6 @@ class CountryController extends Controller
             return [
                 'code' => $country->country_code,
                 'name' => $country->common_name,
-                'language_name' => $country->languages[$languageCode] ?? $languageCode,
             ];
         }));
     }
@@ -104,5 +105,24 @@ class CountryController extends Controller
                 'flag' => $country->flag,
             ];
         }));
+    }
+
+
+
+
+    public function languageDebug($countryCode)
+    {
+        $country = Country::where('country_code', $countryCode)->first();
+
+        if (!$country) {
+            return response()->json(['error' => 'Country not found']);
+        }
+
+        return response()->json([
+            'country' => $country->common_name,
+            'languages_raw' => $country->getAttributes()['languages'],
+            'languages_parsed' => $country->languages,
+            'languages_type' => gettype($country->languages)
+        ]);
     }
 }

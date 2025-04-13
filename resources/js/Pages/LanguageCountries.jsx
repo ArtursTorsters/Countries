@@ -1,28 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link } from "@inertiajs/react";
+import axios from "axios";
+import Card from "../Components/global/Card";
+import Button from "../Components/global/Button";
+import Loading from "../Components/global/Loading";
 
-export default function LanguageCountries({ auth, code }) {
+export default function LanguageCountries({ code }) {
     const [countries, setCountries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [languageName, setLanguageName] = useState('');
+    const [languageName, setLanguageName] = useState("");
 
     useEffect(() => {
+        // lang from uri
+        const params = new URLSearchParams(window.location.search);
+        const nameFromUrl = params.get("name");
+
+        if (nameFromUrl) {
+            setLanguageName(nameFromUrl);
+        }
+
         const fetchCountriesByLanguage = async () => {
             try {
-                const response = await axios.get(`/api/languages/${code}/countries`);
-                setCountries(response.data);
+                const response = await axios.get(
+                    `/api/languages/${code}/countries`
+                );
 
-                // Set language name from the first country
-                if (response.data.length > 0) {
-                    setLanguageName(response.data[0].language_name);
+                // convert obj to arr since the back returns it
+                let countriesArray = [];
+                if (Array.isArray(response.data)) {
+                    countriesArray = response.data;
+                } else if (
+                    typeof response.data === "object" &&
+                    response.data !== null
+                ) {
+                    countriesArray = Object.values(response.data);
                 }
 
+                setCountries(countriesArray);
                 setLoading(false);
             } catch (err) {
-                setError("Failed to load countries for this language");
+                console.error(err);
                 setLoading(false);
             }
         };
@@ -30,67 +48,76 @@ export default function LanguageCountries({ auth, code }) {
         fetchCountriesByLanguage();
     }, [code]);
 
-    if (loading) return (
-        <AuthenticatedLayout user={auth.user}>
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        </AuthenticatedLayout>
-    );
-
-    if (error) return (
-        <AuthenticatedLayout user={auth.user}>
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {error}
-            </div>
-        </AuthenticatedLayout>
-    );
+    if (loading) {
+        <Loading />;
+    }
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                Countries speaking {languageName || code}
-            </h2>}
-        >
-            <Head title={`Countries speaking ${languageName || code}`} />
+        <div className="min-h-screen bg-surface-light">
+            <nav className="main-nav">
+                <div className="section-container">
+                    <Link
+                        href="/"
+                        className="text-2xl font-bold text-brand hover:text-brand-dark transition duration-200"
+                    >
+                        Country Encyclopedia
+                    </Link>
+                </div>
+            </nav>
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6">
-                            <h1 className="text-2xl font-bold mb-6">
-                                Countries speaking {languageName || code}
-                            </h1>
+                <div className="section-container">
+                    <Card shadow="lg" rounded="lg" padding="lg">
+                        <h1 className="text-2xl font-bold mb-6">
+                            Countries speaking {languageName}
+                        </h1>
 
-                            {countries.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {countries.map(country => (
-                                        <Link
-                                            key={country.code}
-                                            href={`/countries/${country.code}`}
-                                            className="block p-4 border rounded-md hover:bg-gray-50 transition duration-150"
-                                        >
-                                            <h3 className="font-medium text-lg">{country.name}</h3>
-                                        </Link>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-600">No countries found for this language.</p>
-                            )}
-
-                            <div className="mt-6">
-                                <Link
-                                    href="/"
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
-                                >
-                                    ← Back to Countries
-                                </Link>
+                        {countries.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {countries.map((country) => (
+                                    <Link
+                                        key={country.code}
+                                        href={`/countries/${country.code}`}
+                                        className="block p-4 border rounded hover:bg-gray-50 transition"
+                                    >
+                                        <h3 className="font-medium text-lg">
+                                            {country.name}
+                                        </h3>
+                                    </Link>
+                                ))}
                             </div>
+                        ) : (
+                            <p className="text-gray-600">
+                                No countries found for this language.
+                            </p>
+                        )}
+
+                        <div className="mt-6 pt-6 border-t border-gray-200">
+                            <Link href="/">
+                                <Button
+                                    variant="primary"
+                                    className="flex items-center"
+                                >
+                                    <svg
+                                        className="w-5 h-5 mr-2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                        ></path>
+                                    </svg>
+                                    Back to Countries
+                                </Button>
+                            </Link>
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }

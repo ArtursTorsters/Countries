@@ -1,188 +1,290 @@
-// resources/js/Pages/CountryDetails.jsx
-import React, { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link } from "@inertiajs/react";
+import axios from "axios";
+import Card from "../Components/global/Card";
+import Button from "../Components/global/Button";
 
 export default function CountryDetails({ code }) {
     const [country, setCountry] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    console.log("country object", country);
 
     useEffect(() => {
         const fetchCountryDetails = async () => {
             try {
                 const response = await axios.get(`/api/countries/${code}`);
-                setCountry(response.data);
-                setLoading(false);
+                const countryData = {
+                    ...response.data,
+                    flag:
+                        typeof response.data.flag === "string"
+                            ? JSON.parse(response.data.flag)
+                            : response.data.flag,
+                    languages:
+                        typeof response.data.languages === "string"
+                            ? JSON.parse(response.data.languages)
+                            : response.data.languages,
+                };
+                setCountry(countryData);
             } catch (err) {
-                setError("Failed to load country details");
-                setLoading(false);
+                console.error(err);
             }
         };
-
         fetchCountryDetails();
     }, [code]);
 
     const toggleFavorite = async () => {
         if (!country) return;
-
         try {
-            const response = await axios.post(`/api/countries/${code}/favorite`);
+            const response = await axios.post(
+                `/api/countries/${code}/favorite`
+            );
             setCountry({
                 ...country,
-                is_favorite: response.data.is_favorite
+                is_favorite: response.data.is_favorite,
             });
         } catch (err) {
-            console.error("Failed to toggle favorite status", err);
+            console.error(err);
         }
     };
-
-    if (loading) return (
-        <div className="min-h-screen flex justify-center items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    );
-
-    if (error) return (
-        <div className="min-h-screen flex justify-center items-center">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {error}
-            </div>
-        </div>
-    );
 
     if (!country) return null;
 
     return (
         <>
-            <Head title={country.common_name} />
-
-            <div className="min-h-screen bg-gray-50">
-                <nav className="bg-white shadow-sm py-4">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="text-2xl font-semibold text-gray-800">Country Encyclopedia</h1>
+            <div className="min-h-screen bg-surface-light">
+                <nav className="main-nav">
+                    <div className="section-container">
+                        <Link
+                            href="/"
+                            className="text-2xl font-bold text-brand hover:text-brand-dark transition duration-200"
+                        >
+                            Country Encyclopedia
+                        </Link>
                     </div>
                 </nav>
 
                 <div className="py-12">
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        <div className="bg-white overflow-hidden shadow-sm rounded-lg">
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div>
-                                        <h1 className="text-3xl font-bold text-blue-600">{country.common_name}</h1>
-                                        <p className="text-gray-600">{country.official_name}</p>
-                                    </div>
-                                    <button
-                                        onClick={toggleFavorite}
-                                        className="flex items-center justify-center p-2 rounded-full hover:bg-gray-100"
+                    <div className="section-container">
+                        <Card
+                            shadow="lg"
+                            rounded="lg"
+                            padding="lg"
+                            className="overflow-hidden"
+                        >
+                            {/* country name */}
+                            <div className="page-header -m-6 mb-6">
+                                {country.flag?.png && (
+                                    <div
+                                        className="header-bg-blur"
+                                        style={{
+                                            backgroundImage: `url(${country.flag.png})`,
+                                        }}
+                                    ></div>
+                                )}
+                                <div className="page-header-content">
+                                    <h1 className="page-header-title">
+                                        {country.common_name}
+                                    </h1>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-start mb-8">
+                                <p className="text-xl italic">
+                                    {country.official_name}
+                                </p>
+                                <Button
+                                    onClick={toggleFavorite}
+                                    className="p-2 rounded-full hover:bg-surface-hover"
+                                >
+                                    <svg
+                                        className={`w-7 h-7 ${
+                                            country.is_favorite
+                                                ? "text-red-500 fill-red-500"
+                                                : "text-text-muted"
+                                        }`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                        ></path>
+                                    </svg>
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Left col*/}
+                                <div>
+                                    <Card title="Flag" className="mb-6">
+                                        <div className="flex justify-center">
+                                            {country.flag?.png ? (
+                                                <img
+                                                    src={country.flag.png}
+                                                    className="h-40 border border-gray-200 shadow-sm rounded"
+                                                />
+                                            ) : (
+                                                <div className="h-40 w-full bg-surface-hover flex items-center justify-center rounded">
+                                                    <span className="text-text-muted">
+                                                        No flag available
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Card>
+
+                                    <Card
+                                        title="Country Information"
+                                        className="mb-6"
+                                    >
+                                        <div className="info-grid">
+                                            <div className="info-item">
+                                                <div className="info-label">
+                                                    Common name
+                                                </div>
+                                                <div className="info-value">
+                                                    {country.common_name}
+                                                </div>
+                                            </div>
+                                            <div className="info-item">
+                                                <div className="info-label">
+                                                    Country Code
+                                                </div>
+                                                <div className="info-value">
+                                                    {country.code}
+                                                </div>
+                                            </div>
+                                            <div className="info-item">
+                                                <div className="info-label">
+                                                    Population
+                                                </div>
+                                                <div className="info-value">
+                                                    {country.population.toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div className="info-item">
+                                                <div className="info-label">
+                                                    Population Rank
+                                                </div>
+                                                <div className="info-value">
+                                                    {country.population_rank ||
+                                                        "N/A"}
+                                                </div>
+                                            </div>
+                                            <div className="info-item">
+                                                <div className="info-label">
+                                                    Area
+                                                </div>
+                                                <div className="info-value">
+                                                    {country.area
+                                                        ? `${country.area.toLocaleString()} km²`
+                                                        : "N/A"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+
+                                {/* right */}
+                                <div>
+                                    <Card title="Languages" className="mb-6">
+                                        {country.languages &&
+                                        Object.keys(country.languages).length >
+                                            0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {Object.entries(
+                                                    country.languages
+                                                ).map(([code, name]) => (
+                                                    <Link
+                                                        key={code}
+                                                        href={`/languages/${code}/countries?name=${encodeURIComponent(
+                                                            name
+                                                        )}`}
+                                                        className="language-tag"
+                                                    >
+                                                        {name} ({code})
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-text-muted italic">
+                                                No language information
+                                                available
+                                            </p>
+                                        )}
+                                    </Card>
+
+                                    <Card
+                                        title="Neighboring Countries"
+                                        className="mb-6"
+                                    >
+                                        {country.neighbors &&
+                                        country.neighbors.length > 0 ? (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                {country.neighbors.map(
+                                                    (neighbor) => (
+                                                        <Link
+                                                            key={neighbor.code}
+                                                            href={`/countries/${neighbor.code}`}
+                                                            className="neighbor-link"
+                                                        >
+                                                            <svg
+                                                                className="w-5 h-5 text-text-muted"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth="2"
+                                                                    d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                                ></path>
+                                                            </svg>
+                                                            <span className="font-medium">
+                                                                {neighbor.name}
+                                                            </span>
+                                                        </Link>
+                                                    )
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="bg-surface-light p-3 rounded italic text-center">
+                                                no data{" "}
+                                            </div>
+                                        )}
+                                    </Card>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 pt-6 border-t border-gray-200">
+                                <Link href="/">
+                                    <Button
+                                        variant="primary"
+                                        className="flex items-center"
                                     >
                                         <svg
-                                            className={`w-6 h-6 ${country.is_favorite ? "text-red-500 fill-red-500" : "text-gray-400"}`}
+                                            className="w-5 h-5 mr-2"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
                                         >
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
                                                 strokeWidth="2"
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
                                             ></path>
                                         </svg>
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                    <div>
-                                        <div className="mb-4">
-                                            <h2 className="font-semibold text-lg mb-2">Flag</h2>
-                                            {country.flag && country.flag.png ? (
-                                                <img
-                                                    src={country.flag.png}
-                                                    alt={`Flag of ${country.common_name}`}
-                                                    className="h-32 border shadow-sm"
-                                                />
-                                            ) : (
-                                                <div className="h-32 w-full bg-gray-200 flex items-center justify-center">
-                                                    No flag available
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <h2 className="font-semibold text-lg mb-2">Country Information</h2>
-                                            <ul className="space-y-2">
-                                                <li><span className="font-medium">Code:</span> {country.code}</li>
-                                                <li><span className="font-medium">Population:</span> {country.population.toLocaleString()}</li>
-                                                <li><span className="font-medium">Population Rank:</span> {country.population_rank}</li>
-                                                <li><span className="font-medium">Area:</span> {country.area ? `${country.area.toLocaleString()} km²` : 'N/A'}</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="mb-4">
-                                            <h2 className="font-semibold text-lg mb-2">Languages</h2>
-                                            {country.languages && Object.keys(country.languages).length > 0 ? (
-                                                <ul className="space-y-1">
-                                                    {Object.entries(country.languages).map(([code, name]) => (
-                                                        <li key={code}>
-                                                            <Link
-                                                                href={`/languages/${code}/countries`}
-                                                                className="text-blue-600 hover:text-blue-800 hover:underline"
-                                                            >
-                                                                {name} ({code})
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-gray-500">No language information available</p>
-                                            )}
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <h2 className="font-semibold text-lg mb-2">Neighboring Countries</h2>
-                                            {country.neighbors && country.neighbors.length > 0 ? (
-                                                <ul className="space-y-1">
-                                                    {country.neighbors.map(neighbor => (
-                                                        <li key={neighbor.code}>
-                                                            <Link
-                                                                href={`/countries/${neighbor.code}`}
-                                                                className="text-blue-600 hover:text-blue-800 hover:underline"
-                                                            >
-                                                                {neighbor.name}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-gray-500">This country has no neighbors (island nation)</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6">
-                                    <Link
-                                        href="/"
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
-                                    >
-                                        ← Back to Countries
-                                    </Link>
-                                </div>
+                                        Back to Countries search page
+                                    </Button>
+                                </Link>
                             </div>
-                        </div>
+                        </Card>
                     </div>
                 </div>
-
-                <footer className="mt-12 py-6">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <p className="text-center">Country Encyclopedia &copy; {new Date().getFullYear()}</p>
-                    </div>
-                </footer>
             </div>
         </>
     );
