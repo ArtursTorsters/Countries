@@ -1,23 +1,32 @@
 #!/bin/bash
 set -e
 
+
+# Wait for MySQL to be ready
+while ! nc -z host.docker.internal 3306; do
+  echo "Waiting for MySQL database to be ready..."
+  sleep 5
+done
+
 # Install dependencies
 composer install
 npm install
 
-# Wait for MySQL to be ready
-until nc -z -v -w30 mysql 3306
-do
-  echo "Waiting for database connection..."
-  sleep 5
-done
+# Build frontend assets
+npm run build
 
-# Run migrations and seed the database
+# Generate application key
+php artisan key:generate
+
+# Run migrations
 php artisan migrate --force
+
+# Fetch countries
 php artisan countries:fetch
 
-# Start npm in the background
-npm run dev &
+# Additional debugging
+echo "Apache configuration:"
+cat /etc/apache2/sites-available/000-default.conf
 
 # Start Apache in the foreground
 apache2-foreground

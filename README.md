@@ -10,7 +10,7 @@
 
 ## Installation
 
-### Using Docker (Recommended)
+### Using Docker
 
 ## Clone the repository:
 git clone https://github.com/ArtursTorsters/country-encyclopedia.git
@@ -22,11 +22,11 @@ git clone https://github.com/ArtursTorsters/country-encyclopedia.git
 
 ## Update the database credentials in the .env file:
 DB_CONNECTION=mysql
-DB_HOST=db
+DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=country_encyclopedia
-DB_USERNAME=root
-DB_PASSWORD=your_password
+DB_DATABASE=
+DB_USERNAME=
+DB_PASSWORD=
 
 ## Start the Docker containers:
 docker-compose up -d
@@ -40,8 +40,11 @@ docker-compose exec app php artisan key:generate
 ## Run the database migrations:
 docker-compose exec app php artisan migrate
 
-## Fetch country data from the API:
+## Fetch country data
 docker-compose exec app php artisan countries:fetch
+
+## Access
+open localhost:8000
 
 
 Manual Installation (Without Docker)
@@ -64,7 +67,7 @@ npm install
 php artisan key:generate
 
 ## Run the database migrations:
-bashphp artisan migrate
+php artisan migrate
 
 ## Fetch country data from the API:
 php artisan countries:fetch
@@ -74,3 +77,6 @@ php artisan serve
 
 ## In a separate terminal, start the Vite development server:
 npm run dev
+
+## Access
+open localhost:8000
