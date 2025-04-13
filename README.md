@@ -1,4 +1,4 @@
-
+# Country Encyclopedia
 
 ## Technology Stack
 
@@ -8,75 +8,126 @@
 - **Database**: MySQL 8.0
 - **Containerization**: Docker & Docker Compose
 
-## Installation
+## Docker Installation
 
-### Using Docker
+### Prerequisites
+- Docker
+- Docker Compose
 
-## Clone the repository:
-git clone https://github.com/ArtursTorsters/country-encyclopedia.git
-   cd countries
+### Steps
 
+1. Clone the repository:
+   ```
+   git clone https://github.com/ArtursTorsters/country-encyclopedia.git
+   cd country-encyclopedia
+   ```
 
-## Create a .env file by copying the example:
-.env.example .env
+2. Create .env file:
+   ```
+   cp .env.example .env
+   ```
 
-## Update the database credentials in the .env file:
-DB_CONNECTION=mysql
-DB_HOST=localhost
-DB_PORT=3306
-DB_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
+3. Update database credentials in the .env file:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
 
-## Start the Docker containers:
-docker-compose up -d
+4. Start Docker containers:
+   ```
+   docker-compose up -d
+   ```
 
-## Install Composer dependencies:
-docker-compose exec app composer install
+5. Install dependencies:
+   ```
+   docker-compose exec app composer install
+   docker-compose exec app npm install
+   ```
 
-## Generate an application key:
-docker-compose exec app php artisan key:generate
+6. Generate application key:
+   ```
+   docker-compose exec app php artisan key:generate
+   ```
 
-## Run the database migrations:
-docker-compose exec app php artisan migrate
+7. Run database migrations:
+   ```
+   docker-compose exec app php artisan migrate
+   ```
 
-## Fetch country data
-docker-compose exec app php artisan countries:fetch
+8. Fetch country data:
+   ```
+   docker-compose exec app php artisan countries:fetch
+   ```
 
-## Access
-open localhost:8000
+9. Access the application:
+   Open `http://localhost:8000`
 
+## Manual Installation
 
-Manual Installation (Without Docker)
+### Prerequisites
+- PHP 8.2
+- Composer
+- Node.js
+- MySQL
 
-## Clone the repository:
-git clone https://github.com/ArtursTorsters/country-encyclopedia.git
-cd countries
+### Steps
 
-## Create a .env file by copying the example:
-cp .env.example .env
+1. Clone the repository:
+   ```
+   git clone https://github.com/ArtursTorsters/country-encyclopedia.git
+   cd country-encyclopedia
+   ```
 
-## Update the database credentials in the .env file to match your local environment.
-Install Composer dependencies:
-composer install
+2. Create .env file:
+   ```
+   cp .env.example .env
+   ```
 
-## Install npm dependencies:
-npm install
+3. Install PHP dependencies:
+   ```
+   composer install
+   ```
 
-## Generate an application key:
-php artisan key:generate
+4. Install npm dependencies:
+   ```
+   npm install
+   ```
 
-## Run the database migrations:
-php artisan migrate
+5. Generate application key:
+   ```
+   php artisan key:generate
+   ```
 
-## Fetch country data from the API:
-php artisan countries:fetch
+6. Run database migrations:
+   ```
+   php artisan migrate
+   ```
 
-## Start the development server:
-php artisan serve
+7. Fetch country data:
+   ```
+   php artisan countries:fetch
+   ```
 
-## In a separate terminal, start the Vite development server:
-npm run dev
+8. Start development servers:
+   ```
+   # Laravel server
+   php artisan serve
 
-## Access
-open localhost:8000
+   # Vite (in a separate terminal)
+   npm run dev
+   ```
+
+9. Access the application:
+   Open `http://localhost:8000`
+
+## Contributing
+
+Contributions are welcome.
+
+## License
+
+[Add your license information]
