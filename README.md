@@ -10,10 +10,6 @@
 
 ## Docker Installation
 
-### Prerequisites
-- Docker
-- Docker Compose
-
 ### Steps
 
 1. Clone the repository:
@@ -68,12 +64,6 @@
 
 ## Manual Installation
 
-### Prerequisites
-- PHP 8.2
-- Composer
-- Node.js
-- MySQL
-
 ### Steps
 
 1. Clone the repository:
@@ -117,17 +107,9 @@
    # Laravel server
    php artisan serve
 
-   # Vite (in a separate terminal)
+   # Vite
    npm run dev
    ```
 
 9. Access the application:
    Open `http://localhost:8000`
-
-## Contributing
-
-Contributions are welcome.
-
-## License
-
-[Add your license information]
